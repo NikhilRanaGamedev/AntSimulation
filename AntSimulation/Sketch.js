@@ -9,7 +9,8 @@ let Offset = 50; // Offset in X and Y. Shifts the draw point of the screen from 
 let XSize = 300; // Number of cells in X.
 let YSize = 180; // Number of cells in Y.
 
-let AmountOfFood = 50;
+let NestFood = 0;
+let Time = 0;
 
 // Sets up the simulation.
 function setup()
@@ -18,20 +19,44 @@ function setup()
 	// strokeWeight(0);
 
 	Init();
-	SpawnFood(0, 0, 20);
-	SpawnFood(XSize - 20, 0, 20);
-	SpawnFood(0, YSize - 20, 20);
-	SpawnFood(XSize - 20, YSize - 20, 20);
+	SpawnFood(0, 0, 10);
+	SpawnFood(XSize - 10, 0, 10);
+	SpawnFood(0, YSize - 10, 10);
+	SpawnFood(XSize - 10, YSize - 10, 10);
 
 	SpawnNest();
-	
-	for (let i = 0; i < 20; i++)
-		Ants.push(new Ant(Cells[YSize / 2][XSize / 2], Direction.NORTH));
+
+	for (let i = 0; i < 2; i++)
+		Ants.push(new Ant(Cells[YSize / 2][XSize / 2], Math.floor(Math.random() * 8)));
+		// Ants.push(new Ant(Cells[YSize / 2][XSize / 2], 0));
 }
 
 function draw()
 {
+	Time += deltaTime / 1000;
 	background(180); // Color background.
+	fill("black"); // Color text.
+	textSize(16);
+	text('Ants:' + Ants.length, 10, 20);
+	text('Food:' + Food.length, 100, 20);
+
+	// if (Time > 5)
+	// {
+	// 	Time = 0;
+
+		for (let i = 0; i < 3; i++)
+		{
+			if (NestFood >= 5)
+			{
+				Ants.push(new Ant(Cells[YSize / 2][XSize / 2], Direction.NORTH));
+				NestFood -= 5;
+			}
+			else
+			{
+				break;
+			}
+		}
+	// }
 
 	noFill();
 	rect(Offset, Offset, XSize * CellSize, YSize * CellSize);
@@ -40,7 +65,7 @@ function draw()
 	DrawNest();
 
 	DrawPheromoneTrail();
-	SimulateAnts();
+	SimulateAnts();	
 }
 
 function Init()
@@ -67,11 +92,12 @@ function SimulateAnts()
 		}
 		else if (ant.homePath.length > 0)
 		{
-			// PheromonePath.push(ant.cell);
+			PheromonePath.push(ant.cell);
 			ant.ReturnHome();
 		}
 		else
 		{
+			NestFood += 1;
 			ant.LookForPheromone(Cells);
 			ant.state = AntState.SEEKER;
 		}
@@ -88,111 +114,104 @@ function GetForwardTiles(ant)
 	{
 		switch (ant.direction)
 		{
-			case Direction.NORTH:
+			case Direction.NORTH:				
 				if (ant.cell.y - 1 >= 0)
 				{
-					if (ant.cell.x - 1 >= 0)
-						forwardTiles.push(Cells[ant.cell.y - 1][ant.cell.x - 1]); // Top Left
-
-					forwardTiles.push(Cells[ant.cell.y - 1][ant.cell.x]); // Top
-
-					if (ant.cell.x + 1 < Cells[0].length)
-						forwardTiles.push(Cells[ant.cell.y - 1][ant.cell.x + 1]); // Top Right
+					for (let x = -1; x < 2; x++)
+					{
+						if (ant.cell.x + x >= 0 && ant.cell.x + x < XSize)
+						{
+							forwardTiles.push(Cells[ant.cell.y - 1][ant.cell.x + x]);
+						}
+					}
 				}
 				break;
 			case Direction.NORTH_EAST:
-				if (ant.cell.y - 1 >= 0)
+				if (ant.cell.y - 1 >= 0 && ant.cell.x + 1 < XSize)
 				{
 					forwardTiles.push(Cells[ant.cell.y - 1][ant.cell.x]); // Top
-
-					if (ant.cell.x + 1 < Cells[0].length)
-						forwardTiles.push(Cells[ant.cell.y - 1][ant.cell.x + 1]); // Top Right
-
-					if (ant.cell.x + 1 < Cells[0].length)
-						forwardTiles.push(Cells[ant.cell.y][ant.cell.x + 1]); // Right
+					forwardTiles.push(Cells[ant.cell.y - 1][ant.cell.x + 1]); // Top Right
+					forwardTiles.push(Cells[ant.cell.y][ant.cell.x + 1]); // Right
 				}
 				break;
 			case Direction.EAST:
-				if (ant.cell.x + 1 < Cells[0].length)
+				if (ant.cell.x + 1 < XSize)
 				{
-					if (ant.cell.y - 1 >= 0)
-						forwardTiles.push(Cells[ant.cell.y - 1][ant.cell.x + 1]);
-
-					forwardTiles.push(Cells[ant.cell.y][ant.cell.x + 1]);
-					
-					if (ant.cell.y + 1 < Cells.length)
-						forwardTiles.push(Cells[ant.cell.y + 1][ant.cell.x + 1]);
+					for (let y = -1; y < 2; y++)
+					{
+						if (ant.cell.y + y >= 0 && ant.cell.y + y < YSize)
+						{
+							forwardTiles.push(Cells[ant.cell.y + y][ant.cell.x + 1]);
+						}
+					}
 				}
 				break;
 			case Direction.SOUTH_EAST:
-				if (ant.cell.x + 1 < Cells[0].length)
+				if (ant.cell.y + 1 < YSize && ant.cell.x + 1 < XSize)
 				{
-					forwardTiles.push(Cells[ant.cell.y][ant.cell.x + 1]);
-					
-					if (ant.cell.y + 1 < Cells.length)
-						forwardTiles.push(Cells[ant.cell.y + 1][ant.cell.x + 1]);
-
-					if (ant.cell.y + 1 < Cells.length)
-						forwardTiles.push(Cells[ant.cell.y + 1][ant.cell.x]);
+					forwardTiles.push(Cells[ant.cell.y][ant.cell.x + 1]); // Right
+					forwardTiles.push(Cells[ant.cell.y + 1][ant.cell.x + 1]); // Bottom Right
+					forwardTiles.push(Cells[ant.cell.y + 1][ant.cell.x]); // Bottom
 				}
 				break;
 			case Direction.SOUTH:
-				if (ant.cell.y + 1 < Cells.length)
+				if (ant.cell.y + 1 < YSize)
 				{
-					if (ant.cell.x - 1 >= 0)
-						forwardTiles.push(Cells[ant.cell.y + 1][ant.cell.x - 1]);
-
-					forwardTiles.push(Cells[ant.cell.y + 1][ant.cell.x]);
-					
-					if (ant.cell.x + 1 < Cells[0].length)
-						forwardTiles.push(Cells[ant.cell.y + 1][ant.cell.x + 1]);
+					for (let x = -1; x < 2; x++)
+					{
+						if (ant.cell.x + x >= 0 && ant.cell.x + x < XSize)
+						{
+							forwardTiles.push(Cells[ant.cell.y + 1][ant.cell.x + x]);
+						}
+					}
 				}
 				break;
 			case Direction.SOUTH_WEST:
-				if (ant.cell.y + 1 < Cells.length)
+				if (ant.cell.y + 1 < YSize && ant.cell.x - 1 >= 0)
 				{
-					forwardTiles.push(Cells[ant.cell.y + 1][ant.cell.x]);
-					
-					if (ant.cell.x + 1 < Cells[0].length)
-						forwardTiles.push(Cells[ant.cell.y + 1][ant.cell.x + 1]);
-
-					if (ant.cell.x - 1 >= 0)
-						forwardTiles.push(Cells[ant.cell.y][ant.cell.x - 1]);
+					forwardTiles.push(Cells[ant.cell.y][ant.cell.x - 1]); // Left
+					forwardTiles.push(Cells[ant.cell.y + 1][ant.cell.x - 1]); // Bottom Left
+					forwardTiles.push(Cells[ant.cell.y + 1][ant.cell.x]); // Bottom
 				}
 				break;
 			case Direction.WEST:
 				if (ant.cell.x - 1 >= 0)
 				{
-					if (ant.cell.y - 1 >= 0)
-						forwardTiles.push(Cells[ant.cell.y - 1][ant.cell.x - 1]);
-
-					forwardTiles.push(Cells[ant.cell.y][ant.cell.x - 1]);
-					
-					if (ant.cell.y + 1 < Cells.length)
-						forwardTiles.push(Cells[ant.cell.y + 1][ant.cell.x - 1]);
+					for (let y = -1; y < 2; y++)
+					{
+						if (ant.cell.y + y >= 0 && ant.cell.y + y < YSize)
+						{
+							forwardTiles.push(Cells[ant.cell.y + y][ant.cell.x - 1]);
+						}
+					}
 				}
 				break;
 			case Direction.NORTH_WEST:
-				if (ant.cell.x - 1 >= 0)
+				if (ant.cell.y - 1 >= 0 && ant.cell.x - 1 >= 0)
 				{
-					forwardTiles.push(Cells[ant.cell.y][ant.cell.x - 1]);
-					
-					if (ant.cell.y + 1 < Cells.length)
-						forwardTiles.push(Cells[ant.cell.y + 1][ant.cell.x - 1]);
-
-					if (ant.cell.y - 1 >= 0)
-						forwardTiles.push(Cells[ant.cell.y - 1][ant.cell.x]); // Top
+					forwardTiles.push(Cells[ant.cell.y - 1][ant.cell.x]); // Top
+					forwardTiles.push(Cells[ant.cell.y - 1][ant.cell.x - 1]); // Top Left
+					forwardTiles.push(Cells[ant.cell.y][ant.cell.x - 1]); // Left
 				}
 				break;
 		}
 
-		if (forwardTiles.length == 0)
+		let nest = 0;
+		for (let tile of forwardTiles)
+		{
+			if (tile && tile.nest)
+				nest++;
+			// else if (!tile)
+			// 	console.log(forwardTiles, ant.direction);
+		}
+
+		if (forwardTiles.length == 0 || nest == forwardTiles.length)
 		{
 			ant.Rotate();
 			forwardTiles = [];
 		}
 	}
-
+	
 	return forwardTiles;
 }
 
@@ -262,14 +281,13 @@ function DrawPheromoneTrail()
 	// {
 	// 	if (cell.pheromone > 0)
 	// 	{
-	// 		fill(255, 192, 203, cell.pheromone * 255);
+	// 		fill(255, 0, 0, cell.pheromone * 255);
 	// 		square(cell.x * CellSize + Offset, cell.y * CellSize + Offset, CellSize);
 			
 	// 		cell.UpdatePheromone();
 	// 	}
 	// 	else
 	// 	{
-	// 		cell.pheromone = 0;
 	// 		let cellIndex = PheromonePath.indexOf(cell);
 
     //         if (cellIndex !== -1)

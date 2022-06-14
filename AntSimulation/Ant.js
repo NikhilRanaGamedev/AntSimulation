@@ -22,52 +22,68 @@ class Ant
 
     Rotate()
     {
+        let randomDirection = [];
+
         switch (this.direction)
         {
-            case Direction.NORTH:
-                this.direction = Direction.NORTH_EAST;
-                break;
-            case Direction.NORTH_EAST:
-                this.direction = Direction.EAST;
-                break;
-            case Direction.EAST:
-                this.direction = Direction.SOUTH_EAST;
-                break;
-            case Direction.SOUTH_EAST:
-                this.direction = Direction.SOUTH;
-                break;
-            case Direction.SOUTH:
-                this.direction = Direction.SOUTH_WEST;
-                break;
-            case Direction.SOUTH_WEST:
-                this.direction = Direction.WEST;
-                break;
-            case Direction.WEST:
-                this.direction = Direction.NORTH_WEST;
-                break;
-            case Direction.NORTH_WEST:
-                this.direction = Direction.NORTH;
-                break;
-            default:
-                console.log("Error: Invalid direction");
-                break;
-
             // case Direction.NORTH:
-            //     this.direction = Math.random() > 0.5 ? Direction.EAST : Direction.WEST;
+            //     this.direction = Direction.NORTH_EAST;
             //     break;
-            // case Direction.SOUTH:
-            //     this.direction = Math.random() > 0.5 ? Direction.EAST : Direction.WEST;
+            // case Direction.NORTH_EAST:
+            //     this.direction = Direction.EAST;
             //     break;
             // case Direction.EAST:
-            //     this.direction = Math.random() > 0.5 ? Direction.NORTH : Direction.SOUTH;
+            //     this.direction = Direction.SOUTH_EAST;
+            //     break;
+            // case Direction.SOUTH_EAST:
+            //     this.direction = Direction.SOUTH;
+            //     break;
+            // case Direction.SOUTH:
+            //     this.direction = Direction.SOUTH_WEST;
+            //     break;
+            // case Direction.SOUTH_WEST:
+            //     this.direction = Direction.WEST;
             //     break;
             // case Direction.WEST:
-            //     this.direction = Math.random() > 0.5 ? Direction.NORTH : Direction.SOUTH;
+            //     this.direction = Direction.NORTH_WEST;
+            //     break;
+            // case Direction.NORTH_WEST:
+            //     this.direction = Direction.NORTH;
             //     break;
             // default:
             //     console.log("Error: Invalid direction");
             //     break;
+
+            case Direction.NORTH:
+                randomDirection = [Direction.WEST, Direction.NORTH_WEST, Direction.NORTH_EAST, Direction.EAST];
+                break;
+            case Direction.NORTH_EAST:
+                randomDirection = [Direction.NORTH_WEST, Direction.NORTH, Direction.EAST, Direction.SOUTH_EAST];
+                break;
+            case Direction.EAST:
+                randomDirection = [Direction.NORTH, Direction.NORTH_EAST, Direction.SOUTH_EAST, Direction.SOUTH];
+                break;
+            case Direction.SOUTH_EAST:
+                randomDirection = [Direction.NORTH_EAST, Direction.EAST, Direction.SOUTH, Direction.SOUTH_WEST];
+                break;
+            case Direction.SOUTH:
+                randomDirection = [Direction.EAST, Direction.SOUTH_EAST, Direction.SOUTH_WEST, Direction.WEST];
+                break;
+            case Direction.SOUTH_WEST:
+                randomDirection = [Direction.NORTH_EAST, Direction.SOUTH, Direction.WEST, Direction.NORTH_WEST];
+                break;
+            case Direction.WEST:
+                randomDirection = [Direction.SOUTH, Direction.SOUTH_WEST, Direction.NORTH_WEST, Direction.NORTH];
+                break;
+            case Direction.NORTH_WEST:
+                randomDirection = [Direction.SOUTH_WEST, Direction.WEST, Direction.NORTH, Direction.NORTH_EAST];
+                break;
+            default:
+                console.log("Error: Invalid direction");
+                break;
         }
+        
+        this.direction = randomDirection[Math.floor(Math.random() * randomDirection.length)];
     }
 
     SearchFood(_forwardTiles)
@@ -137,12 +153,21 @@ class Ant
 
     DrawAnt(_cellSize, _offset)
     {
+        drawingContext.shadowBlur = 4;
+
         if (this.state == AntState.SEEKER)
+        {
             fill(0, 0, 0);
+            drawingContext.shadowColor = color(255, 255, 0);
+        }
         else
+        {
             fill(0, 255, 0);
+            drawingContext.shadowColor = color(0, 255, 0);
+        }
     
         square(this.cell.x * _cellSize + _offset, this.cell.y * _cellSize + _offset, _cellSize);
+        drawingContext.shadowBlur = 0;
     }
 }
 
