@@ -76,7 +76,7 @@ class Ant
 
         for (let cell of _forwardTiles)
         {
-            if (!cell.nest && (cell.food > 0 || (cell.pheromone > moveToCell.pheromone && moveToCell.food == 0)))
+            if (!cell.nest && (cell.food > 0 || (cell.pheromone > moveToCell.pheromone && moveToCell.food <= 0)))
             {
                 moveToCell = cell;
             }
@@ -87,7 +87,7 @@ class Ant
             do
             {
                 moveToCell = _forwardTiles[Math.floor(Math.random() * _forwardTiles.length)];
-            } while (moveToCell.pheromone == 0 && moveToCell.nest);
+            } while (moveToCell.nest);
         }
 
         if (moveToCell.food > 0)
@@ -98,6 +98,30 @@ class Ant
         else
         {
             this.MoveForward(moveToCell);
+        }
+    }
+
+    LookForPheromone(_cellsList)
+    {
+        let highestPheromone = 0;
+        let direction = [Direction.NORTH_WEST, Direction.NORTH, Direction.NORTH_EAST, Direction.WEST, undefined, Direction.EAST, Direction.SOUTH_WEST, Direction.SOUTH, Direction.SOUTH_EAST];
+        let index = 0;
+
+        for (let y = -1; y < 2; y++)
+        {
+            for (let x = -1; x < 2; x++)
+            {
+                if (x != 0 && y != 0 && x + this.cell.x >= 0 && x + this.cell.x < _cellsList[0].length && y + this.cell.y >= 0 && y + this.cell.y < _cellsList.length)
+                {
+                    if (_cellsList[y + this.cell.y][x + this.cell.x].pheromone > highestPheromone)
+                    {
+                        highestPheromone = _cellsList[y + this.cell.y][x + this.cell.x].pheromone;
+                        this.direction = direction[index];
+                    }
+                }
+
+                index++;
+            }
         }
     }
 

@@ -25,7 +25,7 @@ function setup()
 
 	SpawnNest();
 	
-	for (let i = 0; i < 100; i++)
+	for (let i = 0; i < 20; i++)
 		Ants.push(new Ant(Cells[YSize / 2][XSize / 2], Direction.NORTH));
 }
 
@@ -72,6 +72,7 @@ function SimulateAnts()
 		}
 		else
 		{
+			ant.LookForPheromone(Cells);
 			ant.state = AntState.SEEKER;
 		}
 

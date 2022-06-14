@@ -15,5 +15,8 @@ class Cell
     {
         if (this.pheromone > 0)
             this.pheromone -= 0.005;
+
+        if (this.pheromone < 0)
+            this.pheromone = 0;
     }
 }
