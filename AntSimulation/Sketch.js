@@ -26,7 +26,7 @@ function setup()
 	SpawnNest();
 	
 	for (let i = 0; i < 100; i++)
-		Ants.push(new Ant(Cells[YSize / 2][XSize / 2], Math.floor(Math.random() * 4)));
+		Ants.push(new Ant(Cells[YSize / 2][XSize / 2], Direction.NORTH));
 }
 
 function draw()
@@ -39,9 +39,8 @@ function draw()
 	DrawFood();
 	DrawNest();
 
-	SimulateAnts();
-
 	DrawPheromoneTrail();
+	SimulateAnts();
 }
 
 function Init()
@@ -68,7 +67,7 @@ function SimulateAnts()
 		}
 		else if (ant.homePath.length > 0)
 		{
-			PheromonePath.push(ant.cell);
+			// PheromonePath.push(ant.cell);
 			ant.ReturnHome();
 		}
 		else
@@ -186,7 +185,7 @@ function SpawnNest()
 {
 	let nestStartX = XSize / 2;
 	let nestStartY = YSize / 2;
-	let nestSize = 20;
+	let nestSize = 5;
 
 	for (let y = nestStartY; y < nestStartY + nestSize; y++)
 	{
@@ -210,38 +209,53 @@ function DrawNest()
 
 function DrawPheromoneTrail()
 {
-	for (let cell of PheromonePath)
-	{
-		if (cell.pheromone > 0)
-		{
-			fill(255, 192, 203, cell.pheromone * 255);
-			square(cell.x * CellSize + Offset, cell.y * CellSize + Offset, CellSize);
-			
-			cell.UpdatePheromone();
-		}
-		else
-		{
-			cell.pheromone = 0;
-			let cellIndex = PheromonePath.indexOf(cell);
-
-            if (cellIndex !== -1)
-            {
-                PheromonePath.splice(cellIndex, 1);
-            }
-		}
-	}
-
-	// for (let y = 0; y < YSize; y++)
+	// for (let cell of PheromonePath)
 	// {
-	// 	for (let x = 0; x < XSize; x++)
+	// 	if (cell.pheromone > 0)
 	// 	{
-	// 		if (Cells[y][x].pheromone > 0)
-	// 		{
-	// 			fill(255, 192, 203, Cells[y][x].pheromone * 255);
-	// 			square(x * CellSize + Offset, y * CellSize + Offset, CellSize);
+	// 		fill(255, 192, 203, cell.pheromone * 255);
+	// 		square(cell.x * CellSize + Offset, cell.y * CellSize + Offset, CellSize);
+			
+	// 		cell.UpdatePheromone();
+	// 	}
+	// 	else
+	// 	{
+	// 		cell.pheromone = 0;
+	// 		let cellIndex = PheromonePath.indexOf(cell);
 
-	// 			Cells[y][x].UpdatePheromone();
-	// 		}
+    //         if (cellIndex !== -1)
+    //         {
+    //             PheromonePath.splice(cellIndex, 1);
+    //         }
 	// 	}
 	// }
+
+	for (let y = 0; y < YSize; y++)
+	{
+		for (let x = 0; x < XSize; x++)
+		{
+			if (Cells[y][x].pheromone > 0)
+			{
+				fill(255, 0, 0, Cells[y][x].pheromone * 255);
+				square(x * CellSize + Offset, y * CellSize + Offset, CellSize);
+
+				Cells[y][x].UpdatePheromone();
+			}
+			else if (Cells[y][x].pathToHome)
+			{
+				fill(0, 0, 255, 50);
+				square(x * CellSize + Offset, y * CellSize + Offset, CellSize);
+			}
+			// else if (Cells[y][x].food > 0)
+			// {
+			// 	fill(0, 255, 0);
+			// 	square(x * CellSize + Offset, y * CellSize + Offset, CellSize);
+			// }
+			// else if (Cells[y][x].nest)
+			// {
+			// 	fill('yellow');
+			// 	square(x * CellSize + Offset, y * CellSize + Offset, CellSize);
+			// }
+		}
+	}
 }

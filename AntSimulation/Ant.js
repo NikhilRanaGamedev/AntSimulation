@@ -64,7 +64,7 @@ class Ant
 
         for (let cell of _forwardTiles)
         {
-            if (!cell.nest && cell.food > 0 || (cell.pheromone > moveToCell.pheromone && moveToCell.food == 0))
+            if (!cell.nest && (cell.food > 0 || (cell.pheromone > moveToCell.pheromone && moveToCell.food == 0)))
             {
                 moveToCell = cell;
             }
