@@ -99,16 +99,16 @@ function GetForwardTiles(ant)
 						forwardTiles.push(Cells[ant.cell.y - 1][ant.cell.x + 1]); // Top Right
 				}
 				break;
-			case Direction.SOUTH:
-				if (ant.cell.y + 1 < Cells.length)
+			case Direction.NORTH_EAST:
+				if (ant.cell.y - 1 >= 0)
 				{
-					if (ant.cell.x - 1 >= 0)
-						forwardTiles.push(Cells[ant.cell.y + 1][ant.cell.x - 1]);
+					forwardTiles.push(Cells[ant.cell.y - 1][ant.cell.x]); // Top
 
-					forwardTiles.push(Cells[ant.cell.y + 1][ant.cell.x]);
-					
 					if (ant.cell.x + 1 < Cells[0].length)
-						forwardTiles.push(Cells[ant.cell.y + 1][ant.cell.x + 1]);
+						forwardTiles.push(Cells[ant.cell.y - 1][ant.cell.x + 1]); // Top Right
+
+					if (ant.cell.x + 1 < Cells[0].length)
+						forwardTiles.push(Cells[ant.cell.y][ant.cell.x + 1]); // Right
 				}
 				break;
 			case Direction.EAST:
@@ -123,6 +123,42 @@ function GetForwardTiles(ant)
 						forwardTiles.push(Cells[ant.cell.y + 1][ant.cell.x + 1]);
 				}
 				break;
+			case Direction.SOUTH_EAST:
+				if (ant.cell.x + 1 < Cells[0].length)
+				{
+					forwardTiles.push(Cells[ant.cell.y][ant.cell.x + 1]);
+					
+					if (ant.cell.y + 1 < Cells.length)
+						forwardTiles.push(Cells[ant.cell.y + 1][ant.cell.x + 1]);
+
+					if (ant.cell.y + 1 < Cells.length)
+						forwardTiles.push(Cells[ant.cell.y + 1][ant.cell.x]);
+				}
+				break;
+			case Direction.SOUTH:
+				if (ant.cell.y + 1 < Cells.length)
+				{
+					if (ant.cell.x - 1 >= 0)
+						forwardTiles.push(Cells[ant.cell.y + 1][ant.cell.x - 1]);
+
+					forwardTiles.push(Cells[ant.cell.y + 1][ant.cell.x]);
+					
+					if (ant.cell.x + 1 < Cells[0].length)
+						forwardTiles.push(Cells[ant.cell.y + 1][ant.cell.x + 1]);
+				}
+				break;
+			case Direction.SOUTH_WEST:
+				if (ant.cell.y + 1 < Cells.length)
+				{
+					forwardTiles.push(Cells[ant.cell.y + 1][ant.cell.x]);
+					
+					if (ant.cell.x + 1 < Cells[0].length)
+						forwardTiles.push(Cells[ant.cell.y + 1][ant.cell.x + 1]);
+
+					if (ant.cell.x - 1 >= 0)
+						forwardTiles.push(Cells[ant.cell.y][ant.cell.x - 1]);
+				}
+				break;
 			case Direction.WEST:
 				if (ant.cell.x - 1 >= 0)
 				{
@@ -133,6 +169,18 @@ function GetForwardTiles(ant)
 					
 					if (ant.cell.y + 1 < Cells.length)
 						forwardTiles.push(Cells[ant.cell.y + 1][ant.cell.x - 1]);
+				}
+				break;
+			case Direction.NORTH_WEST:
+				if (ant.cell.x - 1 >= 0)
+				{
+					forwardTiles.push(Cells[ant.cell.y][ant.cell.x - 1]);
+					
+					if (ant.cell.y + 1 < Cells.length)
+						forwardTiles.push(Cells[ant.cell.y + 1][ant.cell.x - 1]);
+
+					if (ant.cell.y - 1 >= 0)
+						forwardTiles.push(Cells[ant.cell.y - 1][ant.cell.x]); // Top
 				}
 				break;
 		}

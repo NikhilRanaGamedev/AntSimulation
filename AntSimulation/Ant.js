@@ -25,15 +25,27 @@ class Ant
         switch (this.direction)
         {
             case Direction.NORTH:
+                this.direction = Direction.NORTH_EAST;
+                break;
+            case Direction.NORTH_EAST:
                 this.direction = Direction.EAST;
                 break;
-            case Direction.SOUTH:
-                this.direction = Direction.WEST;
-                break;
             case Direction.EAST:
+                this.direction = Direction.SOUTH_EAST;
+                break;
+            case Direction.SOUTH_EAST:
                 this.direction = Direction.SOUTH;
                 break;
+            case Direction.SOUTH:
+                this.direction = Direction.SOUTH_WEST;
+                break;
+            case Direction.SOUTH_WEST:
+                this.direction = Direction.WEST;
+                break;
             case Direction.WEST:
+                this.direction = Direction.NORTH_WEST;
+                break;
+            case Direction.NORTH_WEST:
                 this.direction = Direction.NORTH;
                 break;
             default:
@@ -112,9 +124,13 @@ class Ant
 
 const Direction = {
     NORTH: 0,
-    SOUTH: 1,
+    NORTH_EAST: 1,
     EAST: 2,
-    WEST: 3
+    SOUTH_EAST: 3,
+    SOUTH: 4,
+    SOUTH_WEST: 5,
+    WEST: 6,
+    NORTH_WEST: 7
 }
 
 const AntState = 
