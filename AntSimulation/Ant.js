@@ -2,20 +2,27 @@ class Ant
 {
     constructor(_cell, _direction)
     {
-        this.cell = _cell;
-        this.direction = _direction;
+        this.cell = _cell; // The current cell of the ant.
+        this.direction = _direction; // The direction of the ant.
         this.state = AntState.SEEKER;
 
-        this.homePath = [];
+        this.homePath = []; // Array containing cells that lead back to home.
+        this.stepsLimit = 250; // Number of steps before an ant returns home if it has not found food.
+        this.steps = this.stepsLimit;
     }
 
+    /* #region Movement */
     MoveForward(_cellToMove)
     {
+        // If searching for food, store each cell to create a path back to home.
         if (this.state == AntState.SEEKER)
         {
-            this.cell.pathToHome = true;
+            this.cell.pathToHome += 1;
             this.homePath.push(this.cell);
         }
+
+        this.cell.occupied = false; // Set
+        _cellToMove.occupied = true;
 
         this.cell = _cellToMove;
     }
@@ -85,14 +92,16 @@ class Ant
         
         this.direction = randomDirection[Math.floor(Math.random() * randomDirection.length)];
     }
+    /* #endregion */
 
+    /* #region Food Search */
     SearchFood(_forwardTiles)
     {
         let moveToCell = _forwardTiles[0];
 
         for (let cell of _forwardTiles)
         {
-            if (!cell.nest && (cell.food > 0 || (cell.pheromone > moveToCell.pheromone && moveToCell.food <= 0)))
+            if (cell.food > 0 || (cell.pheromone > moveToCell.pheromone && moveToCell.food <= 0))
             {
                 moveToCell = cell;
             }
@@ -100,10 +109,7 @@ class Ant
 
         if (moveToCell.pheromone == 0 && moveToCell.food == 0)
         {
-            do
-            {
-                moveToCell = _forwardTiles[Math.floor(Math.random() * _forwardTiles.length)];
-            } while (moveToCell.nest);
+            moveToCell = _forwardTiles[Math.floor(Math.random() * _forwardTiles.length)];
         }
 
         if (moveToCell.food > 0)
@@ -114,6 +120,19 @@ class Ant
         else
         {
             this.MoveForward(moveToCell);
+
+            if (moveToCell.pheromone <= 0)
+                this.StopSearch();
+        }
+    }
+
+    StopSearch()
+    {
+        this.steps -= 1;
+
+        if (this.steps == 0)
+        {
+            this.state = AntState.FAILED_RETURNER;
         }
     }
 
@@ -139,23 +158,27 @@ class Ant
                 index++;
             }
         }
-    }
+    }    
+    /* #endregion */
 
     ReturnHome()
     {
         let cellToMove = this.homePath.pop();
 
-        cellToMove.pheromone = 1;
-        cellToMove.pathToHome = false;
+        if (this.state == AntState.RETURNER)
+            cellToMove.pheromone += 1;
+    
+        cellToMove.pathToHome -= 1;
 
         this.MoveForward(cellToMove);
     }
 
+    /* #region Draw */
     DrawAnt(_cellSize, _offset)
     {
         drawingContext.shadowBlur = 4;
 
-        if (this.state == AntState.SEEKER)
+        if (this.state == AntState.SEEKER || this.state == AntState.FAILED_RETURNER)
         {
             fill(0, 0, 0);
             drawingContext.shadowColor = color(255, 255, 0);
@@ -169,6 +192,17 @@ class Ant
         square(this.cell.x * _cellSize + _offset, this.cell.y * _cellSize + _offset, _cellSize);
         drawingContext.shadowBlur = 0;
     }
+
+    DrawPathToHome(_cellSize, _offset)
+    {
+        fill(0, 0, 255, 50);
+
+        for (let cell of this.homePath)
+        {
+            square(cell.x * _cellSize + _offset, cell.y * _cellSize + _offset, _cellSize);
+        }
+    }
+    /* #endregion */
 }
 
 const Direction = {
@@ -185,5 +219,6 @@ const Direction = {
 const AntState = 
 {
     SEEKER: 0,
-    RETURNER: 1
+    RETURNER: 1,
+    FAILED_RETURNER: 2
 }

@@ -6,70 +6,53 @@ let Nest = [];
 let CellSize = 3; // Size of each cell.
 let Offset = 50; // Offset in X and Y. Shifts the draw point of the screen from top left corner.
 
-let XSize = 300; // Number of cells in X.
-let YSize = 180; // Number of cells in Y.
+let XSize = 360; // Number of cells in X.
+let YSize = 160; // Number of cells in Y.
 
-let NestFood = 0;
-let Time = 0;
+let Time = 0; // Time for a new ant to be spawned.
+let Simulate = false; // Has simulation started.
 
+let NestFood = 0; // Food brought by ants.
+let AntWithFood = 0;
+let StartingAntsAmount = 0;
+
+/* #region P5.js Functions */
 // Sets up the simulation.
 function setup()
 {
 	createCanvas(XSize * CellSize + (Offset * 2), YSize * CellSize + (Offset * 2)); // Create Canvas.
+	background(180);
 	// strokeWeight(0);
 
-	Init();
-	SpawnFood(0, 0, 10);
-	SpawnFood(XSize - 10, 0, 10);
-	SpawnFood(0, YSize - 10, 10);
-	SpawnFood(XSize - 10, YSize - 10, 10);
-
-	SpawnNest();
-
-	for (let i = 0; i < 2; i++)
-		Ants.push(new Ant(Cells[YSize / 2][XSize / 2], Math.floor(Math.random() * 8)));
-		// Ants.push(new Ant(Cells[YSize / 2][XSize / 2], 0));
+	DrawInputsText();
+	DrawInputBoxes();
 }
 
 function draw()
 {
-	Time += deltaTime / 1000;
-	background(180); // Color background.
-	fill("black"); // Color text.
-	textSize(16);
-	text('Ants:' + Ants.length, 10, 20);
-	text('Food:' + Food.length, 100, 20);
-
-	// if (Time > 5)
-	// {
-	// 	Time = 0;
-
-		for (let i = 0; i < 3; i++)
-		{
-			if (NestFood >= 5)
-			{
-				Ants.push(new Ant(Cells[YSize / 2][XSize / 2], Direction.NORTH));
-				NestFood -= 5;
-			}
-			else
-			{
-				break;
-			}
-		}
-	// }
-
-	noFill();
-	rect(Offset, Offset, XSize * CellSize, YSize * CellSize);
-
-	DrawFood();
-	DrawNest();
-
-	DrawPheromoneTrail();
-	SimulateAnts();	
+	if (Simulate)
+	{
+		Time += deltaTime / 1000; // Increment Time.
+		
+		background(180); // Color background.
+		noFill();
+		rect(Offset, Offset, XSize * CellSize, YSize * CellSize); // Draw the outline.
+		DrawText(); // Draw text and values.
+	
+		SpawnNewAnts(); // Check if new ant can be spawned.
+	
+		DrawFood(); // Draw the food.
+		DrawPheromoneTrail(); // Draw the blue and red trails.
+		SimulateAnts(); // Simulate each ant.
+		DrawNest(); // Draw the nest.
+	}
 }
+/* #endregion */
 
+/* #region Initialize */
 function Init()
 {
+	// Initialize cells
 	for (let y = 0; y < YSize; y++)
 	{
 		Cells[y] = [];
@@ -79,33 +62,151 @@ function Init()
 			Cells[y][x] = new Cell(x, y);
 		}
 	}
+
+	// Spawn Food at various location.
+	SpawnFood(0, 0, 10);
+	SpawnFood(XSize - 10, 0, 10);
+	SpawnFood(0, YSize - 10, 10);
+	SpawnFood(XSize - 10, YSize - 10, 10);
+
+	// Spawn the nest.
+	SpawnNest(XSize / 2, YSize / 2, 3);
+}
+
+function DrawText()
+{
+	fill("black");
+	textSize(16);
+
+	text('Ants:' + Ants.length, 10, 20);
+	text('Food:' + Food.length, 100, 20);
+	text('Nest Food:' + NestFood, 200, 20);
+	text('Ant Carrying Food:' + AntWithFood, 320, 20);
+}
+
+// Draws the text for the input boxes.
+function DrawInputsText()
+{
+    text('X:', 10, 20);
+    text('Y:', 150, 20);
+    text('Cell Size:', 300, 20);
+    text('Ants to Spawn at Start:', 475, 20);
+}
+
+// Draws the input boxes.
+function DrawInputBoxes()
+{
+	// Take X Size.
+    let inputXSize = createInput(360, int);
+    inputXSize.size(100, 25);
+    inputXSize.position(35, 8);
+
+	// Take Y Size.
+    let inputYSize = createInput(160, int);
+    inputYSize.size(100, 25);
+    inputYSize.position(180, 8);
+
+	// Take Cell Size.
+    let inputCellSize = createInput(3, int);
+    inputCellSize.size(100, 25);
+    inputCellSize.position(360, 8);
+
+	// Take Number of Ants.
+    let inputAntsAmount = createInput(10, int);
+    inputAntsAmount.size(100, 25);
+    inputAntsAmount.position(610, 8);
+
+	// Generate cave.
+    let simulateButton = createButton('Simulate!');
+    simulateButton.size(100, 32);
+    simulateButton.position(750, 8);
+    simulateButton.mousePressed(function()
+    {
+		clear();
+
+		UpdateInputs();
+		createCanvas(XSize * CellSize + (Offset * 2), YSize * CellSize + (Offset * 2)); // Resize canvas.
+
+		inputXSize.remove();
+		inputYSize.remove();
+		inputCellSize.remove();
+		inputAntsAmount.remove();
+		simulateButton.remove();
+
+		Init();
+	
+		Simulate = true;
+
+		// Spawn ants.
+		for (let i = 0; i < StartingAntsAmount; i++)
+			Ants.push(new Ant(Nest[Math.floor(Math.random() * Nest.length)], Math.floor(Math.random() * 8)));
+
+		function UpdateInputs()
+		{
+			XSize = Number(inputXSize.value());
+			YSize = Number(inputYSize.value());
+			CellSize = Number(inputCellSize.value());
+			StartingAntsAmount = Number(inputAntsAmount.value());
+		}
+    });
+}
+/* #endregion */
+
+/* #region Ants */
+function SpawnNewAnts()
+{
+	if (Time > 5)
+	{
+		Time = 0;
+
+		if (NestFood >= 5)
+		{
+			Ants.push(new Ant(Nest[Math.floor(Math.random() * Nest.length)], Math.floor(Math.random() * 8)));
+			NestFood -= 5;
+		}
+	}
 }
 
 function SimulateAnts()
 {
+	AntWithFood = 0;
+
 	for (let ant of Ants)
 	{
-		if (ant.state == AntState.SEEKER)
+		if (ant.state == AntState.SEEKER) // If ant is seeking food.
 		{
+			// PheromonePath.push(ant.cell);
 			let forwardTiles = GetForwardTiles(ant);
 			ant.SearchFood(forwardTiles);
 		}
-		else if (ant.homePath.length > 0)
+		else if (ant.homePath.length > 0) // If ant is returning home.
 		{
-			PheromonePath.push(ant.cell);
+			// if (ant.state == AntState.RETURNER)
+			// 	PheromonePath.push(ant.cell);
+			if (ant.state == AntState.RETURNER)
+				AntWithFood++;
+
 			ant.ReturnHome();
 		}
 		else
 		{
-			NestFood += 1;
-			ant.LookForPheromone(Cells);
-			ant.state = AntState.SEEKER;
+			if (ant.state == AntState.RETURNER) // Increment nest food if ant brought back food.
+				NestFood++;
+	
+			ant.steps = ant.stepsLimit; // Reset ant step limit.
+			ant.LookForPheromone(Cells); // Look for the strongest phermone trail and turn towards it.
+			ant.state = AntState.SEEKER; // Set ant state to seeker.
 		}
 
+		// Draw the path back home.
+		ant.DrawPathToHome(CellSize, Offset);
+
+		// Draw the ant.
 		ant.DrawAnt(CellSize, Offset);
 	}
 }
 
+// Gets 3 tiles in front of the ant.
 function GetForwardTiles(ant)
 {
 	let forwardTiles = [];
@@ -196,16 +297,18 @@ function GetForwardTiles(ant)
 				break;
 		}
 
-		let nest = 0;
+		// Remove nest and occupied tiles from the list.
 		for (let tile of forwardTiles)
 		{
-			if (tile && tile.nest)
-				nest++;
-			// else if (!tile)
-			// 	console.log(forwardTiles, ant.direction);
+			if (tile.nest || tile.occupied)
+			{
+				let cellIndex = forwardTiles.indexOf(tile);
+	
+				forwardTiles.splice(cellIndex, 1);
+			}
 		}
 
-		if (forwardTiles.length == 0 || nest == forwardTiles.length)
+		if (forwardTiles.length == 0)
 		{
 			ant.Rotate();
 			forwardTiles = [];
@@ -214,7 +317,9 @@ function GetForwardTiles(ant)
 	
 	return forwardTiles;
 }
+/* #endregion */
 
+/* #region Food */
 function SpawnFood(_foodStartX, _foodStartY, _amountOfFood)
 {
 	for (let y = _foodStartY; y < _foodStartY + _amountOfFood; y++)
@@ -248,19 +353,25 @@ function DrawFood()
 		}
 	}
 }
+/* #endregion */
 
-function SpawnNest()
+/* #region Nest */
+function SpawnNest(_nestStartX, _nestStartY, _nestSize)
 {
-	let nestStartX = XSize / 2;
-	let nestStartY = YSize / 2;
-	let nestSize = 5;
-
-	for (let y = nestStartY; y < nestStartY + nestSize; y++)
+	for (let y = _nestStartY; y < _nestStartY + _nestSize; y++)
 	{
-		for (let x = nestStartX; x < nestStartX + nestSize; x++)
+		for (let x = _nestStartX; x < _nestStartX + _nestSize; x++)
 		{
-			Cells[y][x].nest = true;
-			Nest.push(Cells[y][x]);
+			if (y == _nestStartY || y == (_nestStartY + _nestSize) - 1 || x == _nestStartX || x == (_nestStartX + _nestSize) - 1) // Draw the outline of the nest.
+			{
+				Cells[y][x].nest = true;
+				Nest.push(Cells[y][x]);
+			}
+			else // We're using a little trick here. The inside of the nest is marked as occupied so the ants don't step in there. This way they will always move out of the nest.
+			{
+				Nest.push(Cells[y][x]);
+				Cells[y][x].occupied = true;
+			}
 		}
 	}
 }
@@ -274,6 +385,7 @@ function DrawNest()
 		square(nestCell.x * CellSize + Offset, nestCell.y * CellSize + Offset, CellSize);
 	}
 }
+/* #endregion */
 
 function DrawPheromoneTrail()
 {
@@ -308,21 +420,6 @@ function DrawPheromoneTrail()
 
 				Cells[y][x].UpdatePheromone();
 			}
-			else if (Cells[y][x].pathToHome)
-			{
-				fill(0, 0, 255, 50);
-				square(x * CellSize + Offset, y * CellSize + Offset, CellSize);
-			}
-			// else if (Cells[y][x].food > 0)
-			// {
-			// 	fill(0, 255, 0);
-			// 	square(x * CellSize + Offset, y * CellSize + Offset, CellSize);
-			// }
-			// else if (Cells[y][x].nest)
-			// {
-			// 	fill('yellow');
-			// 	square(x * CellSize + Offset, y * CellSize + Offset, CellSize);
-			// }
 		}
 	}
 }
