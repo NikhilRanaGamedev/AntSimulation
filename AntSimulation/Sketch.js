@@ -9,7 +9,6 @@ let Offset = 50; // Offset in X and Y. Shifts the draw point of the screen from 
 let XSize = 360; // Number of cells in X.
 let YSize = 160; // Number of cells in Y.
 
-let Time = 0; // Time for a new ant to be spawned.
 let Simulate = false; // Has simulation started.
 
 let NestFood = 0; // Food brought by ants.
@@ -32,8 +31,6 @@ function draw()
 {
 	if (Simulate)
 	{
-		Time += deltaTime / 1000; // Increment Time.
-		
 		background(180); // Color background.
 		noFill();
 		rect(Offset, Offset, XSize * CellSize, YSize * CellSize); // Draw the outline.
@@ -155,15 +152,10 @@ function DrawInputBoxes()
 /* #region Ants */
 function SpawnNewAnts()
 {
-	if (Time > 5)
+	if (NestFood >= 5)
 	{
-		Time = 0;
-
-		if (NestFood >= 5)
-		{
-			Ants.push(new Ant(Nest[Math.floor(Math.random() * Nest.length)], Math.floor(Math.random() * 8)));
-			NestFood -= 5;
-		}
+		Ants.push(new Ant(Nest[Math.floor(Math.random() * Nest.length)], Math.floor(Math.random() * 8)));
+		NestFood -= 5;
 	}
 }
 
