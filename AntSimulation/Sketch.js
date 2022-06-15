@@ -39,8 +39,10 @@ function draw()
 		SpawnNewAnts(); // Check if new ant can be spawned.
 	
 		DrawFood(); // Draw the food.
-		DrawPheromoneTrail(); // Draw the blue and red trails.
+		// DrawPheromoneTrail(); // Draw the blue and red trails.
+		
 		SimulateAnts(); // Simulate each ant.
+		
 		DrawNest(); // Draw the nest.
 	}
 }
@@ -61,10 +63,10 @@ function Init()
 	}
 
 	// Spawn Food at various location.
-	SpawnFood(0, 0, 10);
-	SpawnFood(XSize - 10, 0, 10);
-	SpawnFood(0, YSize - 10, 10);
-	SpawnFood(XSize - 10, YSize - 10, 10);
+	SpawnFood(0, 0, 50);
+	// SpawnFood(XSize - 10, 0, 10);
+	// SpawnFood(0, YSize - 10, 10);
+	// SpawnFood(XSize - 10, YSize - 10, 10);
 
 	// Spawn the nest.
 	SpawnNest(XSize / 2, YSize / 2, 3);
@@ -79,6 +81,7 @@ function DrawText()
 	text('Food:' + Food.length, 100, 20);
 	text('Nest Food:' + NestFood, 200, 20);
 	text('Ant Carrying Food:' + AntWithFood, 320, 20);
+	text('FPS:' + frameRate().toFixed(0), 500, 20);
 }
 
 // Draws the text for the input boxes.
