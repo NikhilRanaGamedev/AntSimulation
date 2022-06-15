@@ -168,7 +168,6 @@ class Ant
         if (this.state == AntState.RETURNER)
         {
             cellToMove.pheromone += 1;
-            cellToMove.pheromoneCreationTime = second();
         }
     
         cellToMove.pathToHome -= 1;
