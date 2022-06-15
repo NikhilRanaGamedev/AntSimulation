@@ -16,7 +16,7 @@ class Cell
     UpdatePheromone()
     {
         if (this.pheromone > 0)
-            this.pheromone -= 0.005;
+            this.pheromone -= 0.003;
 
         if (this.pheromone < 0)
             this.pheromone = 0;

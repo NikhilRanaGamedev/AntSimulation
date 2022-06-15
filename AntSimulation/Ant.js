@@ -9,6 +9,8 @@ class Ant
         this.homePath = []; // Array containing cells that lead back to home.
         this.stepsLimit = 450; // Number of steps before an ant returns home if it has not found food.
         this.steps = this.stepsLimit;
+
+        this.pathToHomeCounts = 0;
     }
 
     /* #region Movement */
@@ -116,6 +118,7 @@ class Ant
         {
             moveToCell.food -= 1;
             this.state = AntState.RETURNER;
+            this.pathToHomeCounts = this.homePath.length;
         }
         else
         {
@@ -163,9 +166,14 @@ class Ant
 
     ReturnHome()
     {
+        // If the ant is bringing food back to home.
         if (this.state == AntState.RETURNER)
-            this.cell.pheromone += 1;
+        {
+            // The closer the ant is to the food, the more pheromone it will deposit.
+            this.cell.pheromone += this.homePath.length / this.pathToHomeCounts;
+        }
     
+        // Unmark the cell as a path to home.
         this.cell.pathToHome -= 1;
 
         this.MoveForward(this.homePath.pop());
