@@ -39,7 +39,7 @@ function draw()
 		SpawnNewAnts(); // Check if new ant can be spawned.
 	
 		DrawFood(); // Draw the food.
-		// DrawPheromoneTrail(); // Draw the blue and red trails.
+		DrawPheromoneTrail(); // Draw the blue and red trails.
 		
 		SimulateAnts(); // Simulate each ant.
 		

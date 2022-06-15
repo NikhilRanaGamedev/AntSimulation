@@ -7,7 +7,7 @@ class Ant
         this.state = AntState.SEEKER;
 
         this.homePath = []; // Array containing cells that lead back to home.
-        this.stepsLimit = 250; // Number of steps before an ant returns home if it has not found food.
+        this.stepsLimit = 450; // Number of steps before an ant returns home if it has not found food.
         this.steps = this.stepsLimit;
     }
 
@@ -166,7 +166,10 @@ class Ant
         let cellToMove = this.homePath.pop();
 
         if (this.state == AntState.RETURNER)
+        {
             cellToMove.pheromone += 1;
+            cellToMove.pheromoneCreationTime = second();
+        }
     
         cellToMove.pathToHome -= 1;
 
