@@ -163,16 +163,12 @@ class Ant
 
     ReturnHome()
     {
-        let cellToMove = this.homePath.pop();
-
         if (this.state == AntState.RETURNER)
-        {
-            cellToMove.pheromone += 1;
-        }
+            this.cell.pheromone += 1;
     
-        cellToMove.pathToHome -= 1;
+        this.cell.pathToHome -= 1;
 
-        this.MoveForward(cellToMove);
+        this.MoveForward(this.homePath.pop());
     }
 
     /* #region Draw */
