@@ -192,16 +192,6 @@ class Ant
         square(this.cell.x * _cellSize + _offset, this.cell.y * _cellSize + _offset, _cellSize);
         drawingContext.shadowBlur = 0;
     }
-
-    DrawPathToHome(_cellSize, _offset)
-    {
-        fill(0, 0, 255, 50);
-
-        for (let cell of this.homePath)
-        {
-            square(cell.x * _cellSize + _offset, cell.y * _cellSize + _offset, _cellSize);
-        }
-    }
     /* #endregion */
 }
 

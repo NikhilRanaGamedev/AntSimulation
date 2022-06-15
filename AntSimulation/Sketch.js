@@ -1,7 +1,7 @@
 let Cells = []; // Array to store cells.
 let Ants = [];
 let Food = [];
-let PheromonePath = [];
+let PheromonePath = new Set(); // Store cells that are either marked as path to home or food.
 let Nest = [];
 let CellSize = 3; // Size of each cell.
 let Offset = 50; // Offset in X and Y. Shifts the draw point of the screen from top left corner.
@@ -175,18 +175,21 @@ function SimulateAnts()
 	{
 		if (ant.state == AntState.SEEKER) // If ant is seeking food.
 		{
-			// PheromonePath.push(ant.cell);
-			let forwardTiles = GetForwardTiles(ant);
-			ant.SearchFood(forwardTiles);
+			PheromonePath.add(ant.cell); // Store current ant tile as path to home.
+
+			let forwardTiles = GetForwardTiles(ant); // Get the three tiles in front of the ant.
+			ant.SearchFood(forwardTiles); // Choose the best tile to go to.
 		}
 		else if (ant.homePath.length > 0) // If ant is returning home.
 		{
-			// if (ant.state == AntState.RETURNER)
-			// 	PheromonePath.push(ant.cell);
+			// If ant is returning with food.
 			if (ant.state == AntState.RETURNER)
-				AntWithFood++;
+			{
+				PheromonePath.add(ant.cell); // Store current ant tile as path to food.
+				AntWithFood++; // Increment the amount of ants with food.
+			}
 
-			ant.ReturnHome();
+			ant.ReturnHome(); // Take one step back home.
 		}
 		else
 		{
@@ -197,9 +200,6 @@ function SimulateAnts()
 			ant.LookForPheromone(Cells); // Look for the strongest phermone trail and turn towards it.
 			ant.state = AntState.SEEKER; // Set ant state to seeker.
 		}
-
-		// Draw the path back home.
-		ant.DrawPathToHome(CellSize, Offset);
 
 		// Draw the ant.
 		ant.DrawAnt(CellSize, Offset);
@@ -389,37 +389,23 @@ function DrawNest()
 
 function DrawPheromoneTrail()
 {
-	// for (let cell of PheromonePath)
-	// {
-	// 	if (cell.pheromone > 0)
-	// 	{
-	// 		fill(255, 0, 0, cell.pheromone * 255);
-	// 		square(cell.x * CellSize + Offset, cell.y * CellSize + Offset, CellSize);
-			
-	// 		cell.UpdatePheromone();
-	// 	}
-	// 	else
-	// 	{
-	// 		let cellIndex = PheromonePath.indexOf(cell);
-
-    //         if (cellIndex !== -1)
-    //         {
-    //             PheromonePath.splice(cellIndex, 1);
-    //         }
-	// 	}
-	// }
-
-	for (let y = 0; y < YSize; y++)
+	for (let cell of PheromonePath)
 	{
-		for (let x = 0; x < XSize; x++)
+		if (cell.pheromone > 0)
 		{
-			if (Cells[y][x].pheromone > 0)
-			{
-				fill(255, 0, 0, Cells[y][x].pheromone * 255);
-				square(x * CellSize + Offset, y * CellSize + Offset, CellSize);
-
-				Cells[y][x].UpdatePheromone();
-			}
+			fill(255, 0, 0, cell.pheromone * 255);
+			square(cell.x * CellSize + Offset, cell.y * CellSize + Offset, CellSize);
+			
+			cell.UpdatePheromone();
+		}
+		else if (cell.pathToHome > 0)
+		{
+			fill(0, 0, 255, cell.pathToHome * 50);
+			square(cell.x * CellSize + Offset, cell.y * CellSize + Offset, CellSize);
+		}
+		else
+		{
+			PheromonePath.delete(cell);
 		}
 	}
 }
