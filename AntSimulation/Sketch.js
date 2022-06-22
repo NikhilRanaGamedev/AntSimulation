@@ -14,12 +14,14 @@ let Simulate = false; // Has simulation started.
 let NestFood = 0; // Food brought by ants.
 let AntWithFood = 0;
 let StartingAntsAmount = 0;
+let AntsFollowingPheromoneTrail = 0;
 
 /* #region P5.js Functions */
 // Sets up the simulation.
 function setup()
 {
-	createCanvas(XSize * CellSize + (Offset * 2), YSize * CellSize + (Offset * 2)); // Create Canvas.
+	// createCanvas(XSize * CellSize + (Offset * 2), YSize * CellSize + (Offset * 2)); // Create Canvas.
+	createCanvas(1900, 900); // Create Canvas.
 	background(180);
 	// strokeWeight(0);
 
@@ -80,8 +82,10 @@ function DrawText()
 	text('Ants:' + Ants.length, 10, 20);
 	text('Food:' + Food.length, 100, 20);
 	text('Nest Food:' + NestFood, 200, 20);
-	text('Ant Carrying Food:' + AntWithFood, 320, 20);
-	text('FPS:' + frameRate().toFixed(0), 500, 20);
+	text('Ant Carrying Food:' + AntWithFood, 310, 20);
+	text('Ant Looking for Food:' + (Ants.length - AntWithFood), 490, 20);
+	text('Ant Following Pheromone:' + AntsFollowingPheromoneTrail, 700, 20);
+	text('FPS:' + frameRate().toFixed(0), 925, 20);
 }
 
 // Draws the text for the input boxes.
@@ -125,7 +129,7 @@ function DrawInputBoxes()
 		clear();
 
 		UpdateInputs();
-		createCanvas(XSize * CellSize + (Offset * 2), YSize * CellSize + (Offset * 2)); // Resize canvas.
+		// createCanvas(XSize * CellSize + (Offset * 2), YSize * CellSize + (Offset * 2)); // Resize canvas.
 
 		inputXSize.remove();
 		inputYSize.remove();
@@ -139,7 +143,7 @@ function DrawInputBoxes()
 
 		// Spawn ants.
 		for (let i = 0; i < StartingAntsAmount; i++)
-			Ants.push(new Ant(Nest[Math.floor(Math.random() * Nest.length)], Math.floor(Math.random() * 8)));
+			Ants.push(new Ant(Nest[Math.floor(Math.random() * Nest.length)], 7));
 
 		function UpdateInputs()
 		{
@@ -165,6 +169,7 @@ function SpawnNewAnts()
 function SimulateAnts()
 {
 	AntWithFood = 0;
+	AntsFollowingPheromoneTrail = 0;
 
 	for (let ant of Ants)
 	{
@@ -174,6 +179,11 @@ function SimulateAnts()
 
 			let forwardTiles = GetForwardTiles(ant); // Get the three tiles in front of the ant.
 			ant.SearchFood(forwardTiles); // Choose the best tile to go to.
+
+			if (ant.cell.pheromone > 0)
+			{
+				AntsFollowingPheromoneTrail++;
+			}
 		}
 		else if (ant.homePath.length > 0) // If ant is returning home.
 		{
