@@ -12,3 +12,6 @@ When an ant finds food, it starts walking back home. At each step back, it drops
 
 # Nest
 The nest is where all the ants spawn from and carry food back to. It keeps track of a food counter which gets incremented everytime an ant brings home food. It spawns a new ant everytime it has five food and decrements the counter.
+
+# Food
+The food is shown by the green cells. A food cell can contain any amount of food to simulate a longer period of time. For now it has one food in each cell.
