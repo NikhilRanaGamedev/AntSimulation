@@ -143,7 +143,7 @@ function DrawInputBoxes()
 
 		// Spawn ants.
 		for (let i = 0; i < StartingAntsAmount; i++)
-			Ants.push(new Ant(Nest[Math.floor(Math.random() * Nest.length)], 7));
+			Ants.push(new Ant(Nest[Math.floor(Math.random() * Nest.length)], Math.floor(Math.random() * 8));
 
 		function UpdateInputs()
 		{
