@@ -1,3 +1,6 @@
+# Note
+This is just a Proof of Concept and a fun project. The code is not optimized.
+
 # AntSimulation
 Simulating a colony of ant on how they track food and work together.
 
